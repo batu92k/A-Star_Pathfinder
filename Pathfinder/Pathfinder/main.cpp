@@ -9,9 +9,12 @@
   */
 
 #include <iostream>
+#include "a_star_search.h"
 
 int main()
 {
 	std::cout << "Test\n";
+	Init_Grid();
+	FindPath();
 	return EXIT_SUCCESS;
 }
