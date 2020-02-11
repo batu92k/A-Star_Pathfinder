@@ -25,7 +25,7 @@ public:
 };
 
 void Init_Grid();
-void FindPath();
+std::vector<Node*> FindPath();
 
 #endif
 

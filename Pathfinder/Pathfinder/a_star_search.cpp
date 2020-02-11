@@ -69,8 +69,9 @@ float Heuristic(Node* a, Node* b)
 	return Distance(a, b);
 }
 
-void FindPath()
+std::vector<Node*> FindPath()
 {
+	std::vector<Node*> path;
 	Node* current = start;
 	start->localGoal = 0.0f;
 	start->globalGoal = Heuristic(start, target);
@@ -105,6 +106,19 @@ void FindPath()
 				neighbourNode->globalGoal = neighbourNode->localGoal + Heuristic(neighbourNode, target);
 			}
 		}
-	}	
+	}
+
+	// assemble the path from target to start then reverse the vector
+	if (target->isVisited) {
+		Node* pathNode = target;
+		while (pathNode != start) {
+			path.push_back(pathNode);
+			pathNode = pathNode->parent;
+		}
+		path.push_back(start);
+		std::reverse(path.begin(), path.end());
+	}
+
+	return path;
 }
 
