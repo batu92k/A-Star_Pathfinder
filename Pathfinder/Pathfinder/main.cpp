@@ -8,8 +8,10 @@
   ******************************************************************************
   */
 
-#include <iostream>
 #include "a_star_search.h"
+#include "GL/gl3w.h"
+#include "GLFW/glfw3.h"
+#include <iostream>
 
 int main()
 {
