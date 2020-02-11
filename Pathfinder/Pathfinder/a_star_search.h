@@ -16,12 +16,12 @@ class Node {
 public:
 	bool isObstacle = false;
 	bool isVisited = false;
-	float globalGoal;
-	float localGoal;
+	float globalGoal = INFINITY;
+	float localGoal = INFINITY;
 	int x;
 	int y;
 	std::vector<Node*> neighbours;
-	Node* parent;
+	Node* parent = nullptr;
 };
 
 void Init_Grid();
