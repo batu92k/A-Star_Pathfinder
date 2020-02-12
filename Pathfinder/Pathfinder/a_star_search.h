@@ -12,7 +12,7 @@
 
 #include<vector>
 
-class Node {
+struct Node {
 public:
 	bool isObstacle = false;
 	bool isVisited = false;
