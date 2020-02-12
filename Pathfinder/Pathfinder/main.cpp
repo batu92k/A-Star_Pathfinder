@@ -17,6 +17,15 @@ int main()
 {
 	std::cout << "Test\n";
 	Init_Grid();
-	FindPath();
+	auto path = FindPath();
+	if (!path.empty()) {
+		for (int i = 0; i < path.size(); i++) {
+			std::cout << "step: " << i << " x: " << path[i]->x << " y: " << path[i]->y << "\n";
+		}
+	}
+	else {
+		std::cout << "path not found!\n";
+	}
 	return EXIT_SUCCESS;
 }
+
