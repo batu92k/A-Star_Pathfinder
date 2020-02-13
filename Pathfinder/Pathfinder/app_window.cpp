@@ -25,7 +25,6 @@ void Start_AppWindow()
 		return;
 	}
 
-	const char* glsl_version = "#version 330";
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, APP_GL_VER_MAJOR);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, APP_GL_VER_MINOR);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -54,8 +53,7 @@ void Start_AppWindow()
 	std::cout << "Shader Version: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
 
 	while (!glfwWindowShouldClose(window))
-	{
-		glfwPollEvents();
+	{	
 		int display_w, display_h;
 		glfwGetFramebufferSize(window, &display_w, &display_h);
 		glViewport(0, 0, display_w, display_h);
@@ -65,6 +63,7 @@ void Start_AppWindow()
 		//Draw Here!
 
 		glfwSwapBuffers(window);
+		glfwPollEvents();
 	}
 
 	glfwDestroyWindow(window);
