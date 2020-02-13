@@ -16,6 +16,7 @@
 #define APP_GL_VER_MINOR 3
 
 static void glfw_error_callback(int error, const char* description);
+static void glfw_mouse_btn_callback(GLFWwindow* window, int button, int action, int mods);
 
 void Start_AppWindow()
 {
@@ -35,6 +36,7 @@ void Start_AppWindow()
 		return;
 	}
 
+	glfwSetMouseButtonCallback(window, glfw_mouse_btn_callback);
 	glfwMakeContextCurrent(window);
 	glfwSwapInterval(1); // vsync enabled
 
@@ -73,3 +75,14 @@ static void glfw_error_callback(int error, const char* description)
 {
 	fprintf(stderr, "Glfw Error %d: %s\n", error, description);
 }
+
+static void glfw_mouse_btn_callback(GLFWwindow* window, int button, int action, int mods)
+{
+	if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
+		std::cout << "Right Click Clicked\n";
+	}
+	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+		std::cout << "Left Click Clicked\n";
+	}
+}
+
