@@ -3,8 +3,11 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="a_star_search.cpp" />
+    <ClCompile Include="app_window.cpp" />
+    <ClCompile Include="..\Dependencies\GL3W\src\gl3w.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="a_star_search.h" />
+    <ClInclude Include="app_window.h" />
   </ItemGroup>
 </Project>

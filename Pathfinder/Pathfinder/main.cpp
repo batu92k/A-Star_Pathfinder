@@ -8,9 +8,8 @@
   ******************************************************************************
   */
 
+#include "app_window.h"
 #include "a_star_search.h"
-#include "GL/gl3w.h"
-#include "GLFW/glfw3.h"
 #include <iostream>
 
 int main()
@@ -26,6 +25,7 @@ int main()
 	else {
 		std::cout << "path not found!\n";
 	}
+	Start_AppWindow();
 	return EXIT_SUCCESS;
 }
 
