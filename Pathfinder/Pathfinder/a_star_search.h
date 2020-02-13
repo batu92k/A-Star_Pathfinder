@@ -18,14 +18,38 @@ public:
 	bool isVisited = false;
 	float globalGoal = INFINITY;
 	float localGoal = INFINITY;
-	int x;
-	int y;
+	int x = -1;
+	int y = -1;
 	std::vector<Node*> neighbours;
 	Node* parent = nullptr;
 };
 
-void Init_Grid();
-std::vector<Node*> FindPath();
+typedef std::pair<int, int> GridPos;
+
+class MapGrid {
+public:
+	// public funcrtion prototypes
+	MapGrid(int x, int y);
+	GridPos GetTarget(void);
+	void SetTarget(GridPos targetPos);
+	GridPos GetStart(void);
+	void SetStart(GridPos startPos);
+	void ResetMap();
+	void ToggleObstacle(GridPos obstaclePos);
+	std::vector<Node*> Find_AStar_Path();
+
+private:
+	// private variables
+	int _GridSizeX = 0;
+	int _GridSizeY = 0;
+	Node* _Nodes = nullptr;
+	Node* _Target = nullptr;
+	Node* _Start = nullptr;
+
+	// private function prototypes
+	float Distance(Node* a, Node* b);
+	float Heuristic(Node* a, Node* b);
+};
 
 #endif
 
