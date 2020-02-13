@@ -9,7 +9,7 @@
   */
 
 #include "app_window.h"
-#include "a_star_search.h"
+#include "map_grid.h"
 #include <iostream>
 #include <chrono>
 

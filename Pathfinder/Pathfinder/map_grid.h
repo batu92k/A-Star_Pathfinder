@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @file    a_star_search.h
+  * @file    map_grid.h
   * @author  Ali Batuhan KINDAN
   * @date    10.02.2020
   * @brief   This file contains the declaration of methods for A Star Algorithm

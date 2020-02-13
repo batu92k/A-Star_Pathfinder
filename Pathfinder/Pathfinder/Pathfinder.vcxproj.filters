@@ -2,12 +2,12 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="a_star_search.cpp" />
     <ClCompile Include="app_window.cpp" />
     <ClCompile Include="..\Dependencies\GL3W\src\gl3w.c" />
+    <ClCompile Include="map_grid.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="a_star_search.h" />
     <ClInclude Include="app_window.h" />
+    <ClInclude Include="map_grid.h" />
   </ItemGroup>
 </Project>

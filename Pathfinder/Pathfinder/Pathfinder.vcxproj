@@ -139,12 +139,12 @@
   <ItemGroup>
     <ClCompile Include="..\Dependencies\GL3W\src\gl3w.c" />
     <ClCompile Include="app_window.cpp" />
-    <ClCompile Include="a_star_search.cpp" />
+    <ClCompile Include="map_grid.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="app_window.h" />
-    <ClInclude Include="a_star_search.h" />
+    <ClInclude Include="map_grid.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
