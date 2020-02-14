@@ -5,9 +5,11 @@
     <ClCompile Include="app_window.cpp" />
     <ClCompile Include="..\Dependencies\GL3W\src\gl3w.c" />
     <ClCompile Include="map_grid.cpp" />
+    <ClCompile Include="app_graphics.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="app_window.h" />
     <ClInclude Include="map_grid.h" />
+    <ClInclude Include="app_graphics.h" />
   </ItemGroup>
 </Project>

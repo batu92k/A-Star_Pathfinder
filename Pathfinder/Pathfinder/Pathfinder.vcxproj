@@ -138,11 +138,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\Dependencies\GL3W\src\gl3w.c" />
+    <ClCompile Include="app_graphics.cpp" />
     <ClCompile Include="app_window.cpp" />
     <ClCompile Include="map_grid.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="app_graphics.h" />
     <ClInclude Include="app_window.h" />
     <ClInclude Include="map_grid.h" />
   </ItemGroup>

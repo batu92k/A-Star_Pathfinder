@@ -8,6 +8,7 @@
   */
 
 #include "app_window.h"
+#include "app_graphics.h"
 #include <GL/gl3w.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
@@ -57,7 +58,6 @@ unsigned int shaderProgram;
 unsigned int VAO;
 unsigned int EBO; // element array buffer
 
-char infoLog[512];
 
 void GenerateTestBuffers() 
 {
@@ -82,46 +82,6 @@ void GenerateTestBuffers()
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 }
 
-void GenerateTestShaders() 
-{
-	int  success;
-	vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-	glCompileShader(vertexShader);
-	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-	}
-
-	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-	glCompileShader(fragmentShader);
-	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
-	}
-
-	shaderProgram = glCreateProgram();
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragmentShader);
-	glLinkProgram(shaderProgram);
-
-	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-	if (!success) {
-		glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADERS::LINKER_FAILED\n" << infoLog << std::endl;
-	}
-}
-
-void DeleteTestShaders()
-{
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
-}
 
 void Start_AppWindow()
 {
@@ -158,7 +118,9 @@ void Start_AppWindow()
 	std::cout << "Shader Version: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
 
 	GenerateTestBuffers();
-	GenerateTestShaders();
+	CompileShader(vertexShaderSource, &vertexShader, GL_VERTEX_SHADER);
+	CompileShader(fragmentShaderSource, &fragmentShader, GL_FRAGMENT_SHADER);
+	Build_ShaderProgram(&vertexShader, &fragmentShader, &shaderProgram);
 
 	while (!glfwWindowShouldClose(window))
 	{	
@@ -178,7 +140,9 @@ void Start_AppWindow()
 		glfwPollEvents();
 	}
 
-	DeleteTestShaders();
+	glDeleteShader(vertexShader);
+	glDeleteShader(fragmentShader);
+	glDeleteProgram(shaderProgram);
 	glfwDestroyWindow(window);
 	glfwTerminate();
 }
