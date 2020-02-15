@@ -12,22 +12,23 @@
 
 #include<vector>
 
-struct Node {
-public:
-	bool isObstacle = false;
-	bool isVisited = false;
-	float globalGoal = INFINITY;
-	float localGoal = INFINITY;
-	int x = -1;
-	int y = -1;
-	std::vector<Node*> neighbours;
-	Node* parent = nullptr;
-};
-
-typedef std::pair<int, int> GridPos;
-
 class MapGrid {
 public:
+	struct Node {
+	public:
+		bool isObstacle = false;
+		bool isVisited = false;
+		float globalGoal = INFINITY;
+		float localGoal = INFINITY;
+		int x = -1;
+		int y = -1;
+		std::vector<Node*> neighbours;
+		Node* parent = nullptr;
+	};
+
+	typedef std::pair<int, int> GridPos;
+	typedef std::pair<int, int> GridSize;
+
 	// public funcrtion prototypes
 	MapGrid(int x, int y);
 	GridPos GetTarget(void);
@@ -37,6 +38,8 @@ public:
 	void ResetMap();
 	void ToggleObstacle(GridPos obstaclePos);
 	std::vector<Node*> Find_AStar_Path();
+	GridSize GetGridSize(void);
+	Node* GetGridArray(void);
 
 private:
 	// private variables

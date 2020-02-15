@@ -22,7 +22,17 @@ MapGrid::MapGrid(int SizeX = 8, int SizeY = 8)
 	_Target = &_Nodes[(_GridSizeX * _GridSizeY) - 1];
 }
 
-GridPos MapGrid::GetTarget(void)
+MapGrid::Node* MapGrid::GetGridArray(void)
+{
+	return _Nodes;
+}
+
+MapGrid::GridSize MapGrid::GetGridSize(void)
+{
+	return GridSize(_GridSizeX, _GridSizeY);
+}
+
+MapGrid::GridPos MapGrid::GetTarget(void)
 {
 	return GridPos(_Target->x, _Target->y);
 }
@@ -34,7 +44,7 @@ void MapGrid::SetTarget(GridPos targetPos)
 	_Target = &_Nodes[idx];
 }
 
-GridPos MapGrid::GetStart(void)
+MapGrid::GridPos MapGrid::GetStart(void)
 {
 	return GridPos(_Start->x, _Start->y);
 }
@@ -105,7 +115,7 @@ float MapGrid::Heuristic(Node* a, Node* b)
 	return Distance(a, b);
 }
 
-std::vector<Node*> MapGrid::Find_AStar_Path()
+std::vector<MapGrid::Node*> MapGrid::Find_AStar_Path()
 {
 	std::vector<Node*> path;
 	Node* current = _Start;
@@ -146,7 +156,7 @@ std::vector<Node*> MapGrid::Find_AStar_Path()
 
 	// assemble the path from target to start then reverse the vector
 	if (_Target->isVisited) {
-		Node* pathNode = _Target;
+		MapGrid::Node* pathNode = _Target;
 		while (pathNode != _Start) {
 			path.push_back(pathNode);
 			pathNode = pathNode->parent;
