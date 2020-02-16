@@ -12,7 +12,7 @@
 #include <list>
 #include <algorithm>
 
-MapGrid::MapGrid(int SizeX = 8, int SizeY = 8)
+MapGrid::MapGrid(int SizeX = 10, int SizeY = 10)
 {
 	_GridSizeX = SizeX;
 	_GridSizeY = SizeY;

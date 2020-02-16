@@ -9,6 +9,7 @@
 
 #include "app_window.h"
 #include "app_graphics.h"
+#include "map_grid.h"
 #include <GL/gl3w.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
@@ -16,14 +17,21 @@
 #define APP_GL_VER_MAJOR 3
 #define APP_GL_VER_MINOR 3
 
+const int APP_WINDOW_SIZE = 800;
+
+const int GRID_SIZE = 10;
+
+float gridVertiColor[GRID_SIZE * GRID_SIZE * 24];
+unsigned int gridIndices[GRID_SIZE * GRID_SIZE * 6];
+
 static void glfw_error_callback(int error, const char* description);
 static void glfw_mouse_btn_callback(GLFWwindow* window, int button, int action, int mods);
 
 float verticolor[] = {
-	 0.5f,  0.5f, 0.0f, 1.0f, 0, 0,
-	 0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 0,
-	 -0.5f, -0.5f, 0.0f, 1.0f, 0, 1.0f,
-	 -0.5f,  0.5f, 0.0f, 1.0f, 1.0f, 0.0f,
+	 50.0f,  50.0f, 0.0f, 1.0f, 0, 0,
+	 50.0f, -50.0f, 0.0f, 1.0f, 1.0f, 0,
+	 -50.0f, -50.0f, 0.0f, 1.0f, 0, 1.0f,
+	 -50.0f,  50.0f, 0.0f, 1.0f, 1.0f, 0.0f,
 };
 
 unsigned int indices[] = {
@@ -38,8 +46,9 @@ const char* vertexShaderSource =
 "out vec3 ourColor;\n"
 "void main()\n"
 "{\n"
-"	gl_Position = vec4(aPos, 1.0);\n"
-"	ourColor = aColor;\n"
+"   vec3 orthoPos = (aPos - 400) / 400.0f;\n"
+"   gl_Position = vec4(orthoPos, 1.0);\n"
+"   ourColor = aColor;\n"
 "}\0";
 
 const char* fragmentShaderSource =
@@ -69,7 +78,7 @@ void GenerateTestBuffers()
 	glBindVertexArray(VAO);
 	// 2. copy our vertices array in a buffer for OpenGL to use
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(verticolor), verticolor, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(gridVertiColor), gridVertiColor, GL_STATIC_DRAW);
 	// 3. then set our vertex attributes pointers
 	// position has attribute 0
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
@@ -79,7 +88,7 @@ void GenerateTestBuffers()
 	glEnableVertexAttribArray(1);
 	// element buffer
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(gridIndices), gridIndices, GL_STATIC_DRAW);
 }
 
 
@@ -95,7 +104,7 @@ void Start_AppWindow()
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
-	GLFWwindow* window = glfwCreateWindow(800, 800, "A-Star Pathfinder", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(APP_WINDOW_SIZE, APP_WINDOW_SIZE, "A-Star Pathfinder", NULL, NULL);
 	if (window == NULL) {
 		return;
 	}
@@ -117,6 +126,54 @@ void Start_AppWindow()
 	std::cout << "GL Version: " << glGetString(GL_VERSION) << std::endl;
 	std::cout << "Shader Version: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
 
+	MapGrid newMap(GRID_SIZE, GRID_SIZE); // create 10x10 square map grid
+	auto path = newMap.Find_AStar_Path();
+	unsigned int drawFrameOffset = APP_WINDOW_SIZE * 0.1f;
+	
+	int gridCellSize = (APP_WINDOW_SIZE - 2 * drawFrameOffset) / GRID_SIZE;
+	MapGrid::Node* mapGrid = newMap.GetGridArray();
+	float cellColor[3] = { 0, 0, 0 };
+	for (int i = 0; i < GRID_SIZE * GRID_SIZE; i++)
+	{
+		int centerX = drawFrameOffset + gridCellSize * mapGrid[i].x + (gridCellSize / 2);
+		int centerY = drawFrameOffset + gridCellSize * mapGrid[i].y + (gridCellSize / 2);
+		int vtxIdx = 0;
+		int indiceIdx = 0;
+
+		gridVertiColor[i * 24 + vtxIdx++] = centerX + (gridCellSize / 2) * 0.8; // x0
+		gridVertiColor[i * 24 + vtxIdx++] = centerY + (gridCellSize / 2) * 0.8; // y0
+		gridVertiColor[i * 24 + vtxIdx++] = 100.0f;  // z0
+		gridVertiColor[i * 24 + vtxIdx++] = 1.0f; // color
+		gridVertiColor[i * 24 + vtxIdx++] = 0.0f; // color
+		gridVertiColor[i * 24 + vtxIdx++] = 0.0f;  // color
+		gridVertiColor[i * 24 + vtxIdx++] = centerX + (gridCellSize / 2) * 0.8; // x1
+		gridVertiColor[i * 24 + vtxIdx++] = centerY - (gridCellSize / 2) * 0.8; // y1
+		gridVertiColor[i * 24 + vtxIdx++] = 100.0f;  // z1
+		gridVertiColor[i * 24 + vtxIdx++] = 1.0f; // color
+		gridVertiColor[i * 24 + vtxIdx++] = 0.0f; // color
+		gridVertiColor[i * 24 + vtxIdx++] = 0.0f;  // color
+		gridVertiColor[i * 24 + vtxIdx++] = centerX - (gridCellSize / 2) * 0.8; // x2
+		gridVertiColor[i * 24 + vtxIdx++] = centerY - (gridCellSize / 2) * 0.8; // y2
+		gridVertiColor[i * 24 + vtxIdx++] = 100.0f;  // z2
+		gridVertiColor[i * 24 + vtxIdx++] = 1.0f; // color
+		gridVertiColor[i * 24 + vtxIdx++] = 0.0f; // color
+		gridVertiColor[i * 24 + vtxIdx++] = 0.0f;  // color
+		gridVertiColor[i * 24 + vtxIdx++] = centerX - (gridCellSize / 2) * 0.8; // x3
+		gridVertiColor[i * 24 + vtxIdx++] = centerY + (gridCellSize / 2) * 0.8; // y3
+		gridVertiColor[i * 24 + vtxIdx++] = 100.0f;  // z3
+		gridVertiColor[i * 24 + vtxIdx++] = 1.0f; // color
+		gridVertiColor[i * 24 + vtxIdx++] = 0.0f; // color
+		gridVertiColor[i * 24 + vtxIdx++] = 0.0f;  // color
+
+		gridIndices[i * 6 + indiceIdx++] = i * 4;
+		gridIndices[i * 6 + indiceIdx++] = i * 4 + 1;
+		gridIndices[i * 6 + indiceIdx++] = i * 4 + 3;
+		gridIndices[i * 6 + indiceIdx++] = i * 4 + 1;
+		gridIndices[i * 6 + indiceIdx++] = i * 4 + 2;
+		gridIndices[i * 6 + indiceIdx++] = i * 4 + 3;
+	}
+
+
 	GenerateTestBuffers();
 	CompileShader(vertexShaderSource, &vertexShader, GL_VERTEX_SHADER);
 	CompileShader(fragmentShaderSource, &fragmentShader, GL_FRAGMENT_SHADER);
@@ -133,7 +190,7 @@ void Start_AppWindow()
 		//Draw Here!
 		glUseProgram(shaderProgram);
 		glBindVertexArray(VAO);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, GRID_SIZE * GRID_SIZE * 6, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
 
 		glfwPollEvents();
