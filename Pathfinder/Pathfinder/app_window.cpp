@@ -20,16 +20,12 @@
 const int APP_WINDOW_SIZE = 800;
 const int GRID_SIZE = 10;
 
-const int DRAW_FRAME_OFFSET = APP_WINDOW_SIZE * 0.05f;
-const int GRID_CELL_SIZE = (APP_WINDOW_SIZE - 2 * DRAW_FRAME_OFFSET) / GRID_SIZE;
+const float DRAW_FRAME_OFFSET = APP_WINDOW_SIZE * 0.05f;
+const float GRID_CELL_SIZE = (APP_WINDOW_SIZE - 2.0f * DRAW_FRAME_OFFSET) / GRID_SIZE;
 
 MapGrid newMap(GRID_SIZE, GRID_SIZE);  // create 10x10 square map grid
 float gridVertiColor[GRID_SIZE * GRID_SIZE * 24];
 unsigned int gridIndices[GRID_SIZE * GRID_SIZE * 6];
-
-static void UpdateGridVertices(void);
-static void glfw_error_callback(int error, const char* description);
-static void glfw_mouse_btn_callback(GLFWwindow* window, int button, int action, int mods);
 
 const char* vertexShaderSource =
 "#version 330 core\n"
@@ -58,6 +54,10 @@ unsigned int fragmentShader;
 unsigned int shaderProgram;
 unsigned int VAO;
 unsigned int EBO; // element array buffer
+
+static void UpdateGridVertices(void);
+static void glfw_error_callback(int error, const char* description);
+static void glfw_mouse_btn_callback(GLFWwindow* window, int button, int action, int mods);
 
 
 void GenerateTestBuffers() 
@@ -157,31 +157,31 @@ static void UpdateGridVertices(void)
 	float cellColor[3] = { 0, 0, 0 };
 	for (int i = 0; i < GRID_SIZE * GRID_SIZE; i++)
 	{
-		int centerX = DRAW_FRAME_OFFSET + GRID_CELL_SIZE * mapGrid[i].x + (GRID_CELL_SIZE / 2);
-		int centerY = DRAW_FRAME_OFFSET + GRID_CELL_SIZE * mapGrid[i].y + (GRID_CELL_SIZE / 2);
+		float centerX = DRAW_FRAME_OFFSET + GRID_CELL_SIZE * mapGrid[i].x + (GRID_CELL_SIZE / 2.0f);
+		float centerY = DRAW_FRAME_OFFSET + GRID_CELL_SIZE * mapGrid[i].y + (GRID_CELL_SIZE / 2.0f);
 		int vtxIdx = 0;
 		int indiceIdx = 0;
 
-		gridVertiColor[i * 24 + vtxIdx++] = centerX + (GRID_CELL_SIZE / 2) * 0.8; // x0
-		gridVertiColor[i * 24 + vtxIdx++] = centerY + (GRID_CELL_SIZE / 2) * 0.8; // y0
+		gridVertiColor[i * 24 + vtxIdx++] = centerX + (GRID_CELL_SIZE / 2.0f) * 0.8f; // x0
+		gridVertiColor[i * 24 + vtxIdx++] = centerY + (GRID_CELL_SIZE / 2.0f) * 0.8f; // y0
 		gridVertiColor[i * 24 + vtxIdx++] = 100.0f;  // z0
 		gridVertiColor[i * 24 + vtxIdx++] = 1.0f; // color
 		gridVertiColor[i * 24 + vtxIdx++] = 0.0f; // color
 		gridVertiColor[i * 24 + vtxIdx++] = 0.0f;  // color
-		gridVertiColor[i * 24 + vtxIdx++] = centerX + (GRID_CELL_SIZE / 2) * 0.8; // x1
-		gridVertiColor[i * 24 + vtxIdx++] = centerY - (GRID_CELL_SIZE / 2) * 0.8; // y1
+		gridVertiColor[i * 24 + vtxIdx++] = centerX + (GRID_CELL_SIZE / 2.0f) * 0.8f; // x1
+		gridVertiColor[i * 24 + vtxIdx++] = centerY - (GRID_CELL_SIZE / 2.0f) * 0.8f; // y1
 		gridVertiColor[i * 24 + vtxIdx++] = 100.0f;  // z1
 		gridVertiColor[i * 24 + vtxIdx++] = 1.0f; // color
 		gridVertiColor[i * 24 + vtxIdx++] = 0.0f; // color
 		gridVertiColor[i * 24 + vtxIdx++] = 0.0f;  // color
-		gridVertiColor[i * 24 + vtxIdx++] = centerX - (GRID_CELL_SIZE / 2) * 0.8; // x2
-		gridVertiColor[i * 24 + vtxIdx++] = centerY - (GRID_CELL_SIZE / 2) * 0.8; // y2
+		gridVertiColor[i * 24 + vtxIdx++] = centerX - (GRID_CELL_SIZE / 2.0f) * 0.8f; // x2
+		gridVertiColor[i * 24 + vtxIdx++] = centerY - (GRID_CELL_SIZE / 2.0f) * 0.8f; // y2
 		gridVertiColor[i * 24 + vtxIdx++] = 100.0f;  // z2
 		gridVertiColor[i * 24 + vtxIdx++] = 1.0f; // color
 		gridVertiColor[i * 24 + vtxIdx++] = 0.0f; // color
 		gridVertiColor[i * 24 + vtxIdx++] = 0.0f;  // color
-		gridVertiColor[i * 24 + vtxIdx++] = centerX - (GRID_CELL_SIZE / 2) * 0.8; // x3
-		gridVertiColor[i * 24 + vtxIdx++] = centerY + (GRID_CELL_SIZE / 2) * 0.8; // y3
+		gridVertiColor[i * 24 + vtxIdx++] = centerX - (GRID_CELL_SIZE / 2.0f) * 0.8f; // x3
+		gridVertiColor[i * 24 + vtxIdx++] = centerY + (GRID_CELL_SIZE / 2.0f) * 0.8f; // y3
 		gridVertiColor[i * 24 + vtxIdx++] = 100.0f;  // z3
 		gridVertiColor[i * 24 + vtxIdx++] = 1.0f; // color
 		gridVertiColor[i * 24 + vtxIdx++] = 0.0f; // color
