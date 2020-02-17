@@ -77,7 +77,7 @@ void MapGrid::ResetMap()
 			_Nodes[y * _GridSizeX + x].x = x;
 			_Nodes[y * _GridSizeX + x].y = y;
 			_Nodes[y * _GridSizeX + x].parent = nullptr;
-			_Nodes[y * _GridSizeX + x].isObstacle = false;
+			//_Nodes[y * _GridSizeX + x].isObstacle = false; // keep the obstacle value for new calculation
 			_Nodes[y * _GridSizeX + x].isVisited = false;
 			_Nodes[y * _GridSizeX + x].globalGoal = INFINITY;
 			_Nodes[y * _GridSizeX + x].localGoal = INFINITY;
