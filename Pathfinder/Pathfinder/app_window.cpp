@@ -238,10 +238,12 @@ static void glfw_mouse_btn_callback(GLFWwindow* window, int button, int action, 
 			UpdateGridVertices();
 		}
 		if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-			std::cout << "Left Click Clicked\n";
+			newMap.SetStartPos(MapGrid::GridPos(cellX, cellY));
+			UpdateGridVertices();
 		}
 		if (button == GLFW_MOUSE_BUTTON_MIDDLE && action == GLFW_PRESS) {
-			std::cout << "Middle Click Clicked\n";
+			newMap.SetTargetPos(MapGrid::GridPos(cellX, cellY));
+			UpdateGridVertices();
 		}
 	}
 }
