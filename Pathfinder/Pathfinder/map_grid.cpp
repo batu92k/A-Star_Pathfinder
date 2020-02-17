@@ -18,8 +18,8 @@ MapGrid::MapGrid(int SizeX = 10, int SizeY = 10)
 	_GridSizeY = SizeY;
 	ResetMap();
 	// set initial start and target
-	_Start = &_Nodes[0];
-	_Target = &_Nodes[(_GridSizeX * _GridSizeY) - 1];
+	_Start = &_Nodes[0]; // bottom left corner
+	_Target = &_Nodes[(_GridSizeX * _GridSizeY) - 1]; // top right corner
 }
 
 MapGrid::Node* MapGrid::GetGridArray(void)
@@ -52,6 +52,7 @@ void MapGrid::SetTargetPos(GridPos targetPos)
 	int idx = targetPos.second * _GridSizeX + targetPos.first;
 	if (idx > (_GridSizeX * _GridSizeY) || idx < 0) return;
 	_Target = &_Nodes[idx];
+	_Target->isObstacle = false; // in case if its obstacle
 }
 
 MapGrid::GridPos MapGrid::GetStartPos(void)
@@ -65,6 +66,7 @@ void MapGrid::SetStartPos(GridPos startPos)
 	int idx = startPos.second * _GridSizeX + startPos.first;
 	if (idx > (_GridSizeX * _GridSizeY - 1) || idx < 0) return;
 	_Start = &_Nodes[idx];
+	_Start->isObstacle = false; // in case if its obstacle
 }
 
 void MapGrid::ToggleObstacle(GridPos obstaclePos)
