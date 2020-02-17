@@ -26,10 +26,10 @@ bool CompileShader(const char* source, GLuint* outShader, GLenum shaderType)
 	if (!success) {
 		glGetShaderInfoLog(*outShader, 512, NULL, infoLog);
 		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-		return true;
+		return false;
 	}
 	
-	return false;
+	return true;
 }
 
 bool Build_ShaderProgram(GLuint* vtxShader, GLuint* fragShader, GLuint* outProgram)
@@ -45,9 +45,9 @@ bool Build_ShaderProgram(GLuint* vtxShader, GLuint* fragShader, GLuint* outProgr
 	if (!success) {
 		glGetProgramInfoLog(*outProgram, 512, NULL, infoLog);
 		std::cout << "ERROR::SHADERS::LINKER_FAILED\n" << infoLog << std::endl;
-		return true;
+		return false;
 	}
 
-	return false;
+	return true;
 }
 
