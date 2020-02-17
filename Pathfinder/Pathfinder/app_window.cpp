@@ -220,11 +220,29 @@ static void glfw_error_callback(int error, const char* description)
 
 static void glfw_mouse_btn_callback(GLFWwindow* window, int button, int action, int mods)
 {
-	if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
-		std::cout << "Right Click Clicked\n";
-	}
-	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-		std::cout << "Left Click Clicked\n";
+	int width, height;
+	double curPosX, curPosY;
+	glfwGetFramebufferSize(window, &width, &height);
+	glfwGetCursorPos(window, &curPosX, &curPosY);
+	// adjust Y origin from top left to bottom left
+	curPosY -= height;
+	curPosY = -curPosY;
+
+	if (curPosX > DRAW_FRAME_OFFSET&& curPosX < ((double)width - DRAW_FRAME_OFFSET) &&
+		curPosY > DRAW_FRAME_OFFSET&& curPosY < ((double)height - DRAW_FRAME_OFFSET)) {
+		int cellX = (curPosX - DRAW_FRAME_OFFSET) / GRID_CELL_SIZE;
+		int cellY = (curPosY - DRAW_FRAME_OFFSET) / GRID_CELL_SIZE;
+
+		if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
+			newMap.ToggleObstacle(MapGrid::GridPos(cellX, cellY));
+			UpdateGridVertices();
+		}
+		if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+			std::cout << "Left Click Clicked\n";
+		}
+		if (button == GLFW_MOUSE_BUTTON_MIDDLE && action == GLFW_PRESS) {
+			std::cout << "Middle Click Clicked\n";
+		}
 	}
 }
 
