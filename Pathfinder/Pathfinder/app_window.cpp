@@ -27,6 +27,12 @@ MapGrid newMap(GRID_SIZE, GRID_SIZE);  // create 10x10 square map grid
 float gridVertiColor[GRID_SIZE * GRID_SIZE * 24];
 unsigned int gridIndices[GRID_SIZE * GRID_SIZE * 6];
 
+const float COLOR_EMPTY[3] = { 52.0f / 255.0f, 198.0f / 255.0f ,235.0f / 255.0f };
+const float COLOR_TARGET[3] = { 1.0f, 0.0f, 0.0f };
+const float COLOR_START[3] = { 0.0f, 1.0f, 0.0f };
+const float COLOR_OBSTACE[3] = { 169.0f / 255.0f, 169.0f / 255.0f ,169.0f / 255.0f };
+const float COLOR_VISITED[3] = { 235.0f / 255.0f , 153.0f / 255.0f, 52.0f / 255.0f };
+
 const char* vertexShaderSource =
 "#version 330 core\n"
 "layout(location = 0) in vec3 aPos;\n"
@@ -152,40 +158,48 @@ void Start_AppWindow()
 
 static void UpdateGridVertices(void)
 {
+	newMap.ResetMap();
 	auto path = newMap.Find_AStar_Path();
 	MapGrid::Node* mapGrid = newMap.GetGridArray();
-	float cellColor[3] = { 0, 0, 0 };
+	const MapGrid::Node* startNode = newMap.GetStartNode();
+	const MapGrid::Node* targetNode = newMap.GetTargetNode();
+
 	for (int i = 0; i < GRID_SIZE * GRID_SIZE; i++)
 	{
 		float centerX = DRAW_FRAME_OFFSET + GRID_CELL_SIZE * mapGrid[i].x + (GRID_CELL_SIZE / 2.0f);
 		float centerY = DRAW_FRAME_OFFSET + GRID_CELL_SIZE * mapGrid[i].y + (GRID_CELL_SIZE / 2.0f);
 		int vtxIdx = 0;
 		int indiceIdx = 0;
+		const float* cellColor = COLOR_EMPTY;
+		if (&mapGrid[i] == startNode) cellColor = COLOR_START;
+		else if (&mapGrid[i] == targetNode) cellColor = COLOR_TARGET;
+		else if (mapGrid[i].isObstacle) cellColor = COLOR_OBSTACE;
+		else if (mapGrid[i].isVisited) cellColor = COLOR_VISITED;
 
 		gridVertiColor[i * 24 + vtxIdx++] = centerX + (GRID_CELL_SIZE / 2.0f) * 0.8f; // x0
 		gridVertiColor[i * 24 + vtxIdx++] = centerY + (GRID_CELL_SIZE / 2.0f) * 0.8f; // y0
 		gridVertiColor[i * 24 + vtxIdx++] = 100.0f;  // z0
-		gridVertiColor[i * 24 + vtxIdx++] = 1.0f; // color
-		gridVertiColor[i * 24 + vtxIdx++] = 0.0f; // color
-		gridVertiColor[i * 24 + vtxIdx++] = 0.0f;  // color
+		gridVertiColor[i * 24 + vtxIdx++] = cellColor[0]; // color
+		gridVertiColor[i * 24 + vtxIdx++] = cellColor[1]; // color
+		gridVertiColor[i * 24 + vtxIdx++] = cellColor[2];  // color
 		gridVertiColor[i * 24 + vtxIdx++] = centerX + (GRID_CELL_SIZE / 2.0f) * 0.8f; // x1
 		gridVertiColor[i * 24 + vtxIdx++] = centerY - (GRID_CELL_SIZE / 2.0f) * 0.8f; // y1
 		gridVertiColor[i * 24 + vtxIdx++] = 100.0f;  // z1
-		gridVertiColor[i * 24 + vtxIdx++] = 1.0f; // color
-		gridVertiColor[i * 24 + vtxIdx++] = 0.0f; // color
-		gridVertiColor[i * 24 + vtxIdx++] = 0.0f;  // color
+		gridVertiColor[i * 24 + vtxIdx++] = cellColor[0]; // color
+		gridVertiColor[i * 24 + vtxIdx++] = cellColor[1]; // color
+		gridVertiColor[i * 24 + vtxIdx++] = cellColor[2];  // color
 		gridVertiColor[i * 24 + vtxIdx++] = centerX - (GRID_CELL_SIZE / 2.0f) * 0.8f; // x2
 		gridVertiColor[i * 24 + vtxIdx++] = centerY - (GRID_CELL_SIZE / 2.0f) * 0.8f; // y2
 		gridVertiColor[i * 24 + vtxIdx++] = 100.0f;  // z2
-		gridVertiColor[i * 24 + vtxIdx++] = 1.0f; // color
-		gridVertiColor[i * 24 + vtxIdx++] = 0.0f; // color
-		gridVertiColor[i * 24 + vtxIdx++] = 0.0f;  // color
+		gridVertiColor[i * 24 + vtxIdx++] = cellColor[0]; // color
+		gridVertiColor[i * 24 + vtxIdx++] = cellColor[1]; // color
+		gridVertiColor[i * 24 + vtxIdx++] = cellColor[2];  // color
 		gridVertiColor[i * 24 + vtxIdx++] = centerX - (GRID_CELL_SIZE / 2.0f) * 0.8f; // x3
 		gridVertiColor[i * 24 + vtxIdx++] = centerY + (GRID_CELL_SIZE / 2.0f) * 0.8f; // y3
 		gridVertiColor[i * 24 + vtxIdx++] = 100.0f;  // z3
-		gridVertiColor[i * 24 + vtxIdx++] = 1.0f; // color
-		gridVertiColor[i * 24 + vtxIdx++] = 0.0f; // color
-		gridVertiColor[i * 24 + vtxIdx++] = 0.0f;  // color
+		gridVertiColor[i * 24 + vtxIdx++] = cellColor[0]; // color
+		gridVertiColor[i * 24 + vtxIdx++] = cellColor[1]; // color
+		gridVertiColor[i * 24 + vtxIdx++] = cellColor[2];  // color
 
 		gridIndices[i * 6 + indiceIdx++] = i * 4;
 		gridIndices[i * 6 + indiceIdx++] = i * 4 + 1;
@@ -194,6 +208,9 @@ static void UpdateGridVertices(void)
 		gridIndices[i * 6 + indiceIdx++] = i * 4 + 2;
 		gridIndices[i * 6 + indiceIdx++] = i * 4 + 3;
 	}
+	// update grid VBO after modification
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(gridVertiColor), gridVertiColor, GL_STATIC_DRAW);
 }
 
 static void glfw_error_callback(int error, const char* description)
