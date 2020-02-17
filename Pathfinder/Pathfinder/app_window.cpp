@@ -150,9 +150,11 @@ void Start_AppWindow(void)
 		glUseProgram(gridShaderPrg);
 		glBindVertexArray(gridVAO);
 		glDrawElements(GL_TRIANGLES, GRID_SIZE * GRID_SIZE * 6, GL_UNSIGNED_INT, 0);
-		glUseProgram(pathShaderPrg);
-		glBindVertexArray(pathVAO);
-		glDrawArrays(GL_LINE_STRIP, 0, pathVertices.size() / 3);
+		if (pathVertices.size()) {
+			glUseProgram(pathShaderPrg);
+			glBindVertexArray(pathVAO);
+			glDrawArrays(GL_LINE_STRIP, 0, pathVertices.size() / 3);
+		}
 
 		glfwPollEvents();
 		glfwSwapBuffers(window);
@@ -179,7 +181,7 @@ static void GenerateDrawBuffers(void)
 	glBindVertexArray(gridVAO);
 	// 2. copy our vertices array in a buffer for OpenGL to use
 	glBindBuffer(GL_ARRAY_BUFFER, gridVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(gridVertiColor), gridVertiColor, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(gridVertiColor), gridVertiColor, GL_DYNAMIC_DRAW);
 	// 3. then set our vertex attributes pointers
 	// position has attribute 0
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
@@ -189,7 +191,7 @@ static void GenerateDrawBuffers(void)
 	glEnableVertexAttribArray(1);
 	// element buffer
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gridEBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(gridIndices), gridIndices, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(gridIndices), gridIndices, GL_DYNAMIC_DRAW);
 
 	// PATH DRAW BUFFERS
 	// generate arrays
@@ -199,7 +201,7 @@ static void GenerateDrawBuffers(void)
 	glBindVertexArray(pathVAO);
 	// compy vertices to VBO
 	glBindBuffer(GL_ARRAY_BUFFER, pathVBO);
-	glBufferData(GL_ARRAY_BUFFER, pathVertices.size() * sizeof(pathVertices[0]), &pathVertices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, pathVertices.size() * sizeof(pathVertices[0]), &pathVertices[0], GL_DYNAMIC_DRAW);
 	// vertex attrib pointer
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
@@ -258,22 +260,24 @@ static void UpdateGridVertices(void)
 	}
 	// update grid VBO after modification
 	glBindBuffer(GL_ARRAY_BUFFER, gridVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(gridVertiColor), gridVertiColor, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(gridVertiColor), gridVertiColor, GL_DYNAMIC_DRAW);
 
 	// generate path vertices
 	pathVertices.clear();
-	for (int i = 0; i < path.size(); i++)
+	if (path.size()) // if path is found then update vertices
 	{
-		float centerX = DRAW_FRAME_OFFSET + GRID_CELL_SIZE * path[i]->x + (GRID_CELL_SIZE / 2.0f);
-		float centerY = DRAW_FRAME_OFFSET + GRID_CELL_SIZE * path[i]->y + (GRID_CELL_SIZE / 2.0f);
-		pathVertices.push_back(centerX);
-		pathVertices.push_back(centerY);
-		pathVertices.push_back(150.0f);
+		for (int i = 0; i < path.size(); i++)
+		{
+			float centerX = DRAW_FRAME_OFFSET + GRID_CELL_SIZE * path[i]->x + (GRID_CELL_SIZE / 2.0f);
+			float centerY = DRAW_FRAME_OFFSET + GRID_CELL_SIZE * path[i]->y + (GRID_CELL_SIZE / 2.0f);
+			pathVertices.push_back(centerX);
+			pathVertices.push_back(centerY);
+			pathVertices.push_back(150.0f);
+		}
+		// update path VBO after modification
+		glBindBuffer(GL_ARRAY_BUFFER, pathVBO);
+		glBufferData(GL_ARRAY_BUFFER, pathVertices.size() * sizeof(float), &pathVertices[0], GL_DYNAMIC_DRAW);
 	}
-
-	// update path VBO after modification
-	glBindBuffer(GL_ARRAY_BUFFER, pathVBO);
-	glBufferData(GL_ARRAY_BUFFER, pathVertices.size() * sizeof(pathVertices[0]), &pathVertices[0], GL_STATIC_DRAW);
 }
 
 static void glfw_error_callback(int error, const char* description)
