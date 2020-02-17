@@ -7,8 +7,8 @@
   ******************************************************************************
   */
 
-#ifndef A_STAR_SEARCH_H
-#define A_STAR_SEARCH_H
+#ifndef MAP_GRID_H
+#define MAP_GRID_H
 
 #include<vector>
 
