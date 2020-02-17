@@ -10,6 +10,6 @@
 #ifndef APP_WINDOW_H
 #define APP_WINDOW_H
 
-void Start_AppWindow();
+void Start_AppWindow(void);
 
 #endif

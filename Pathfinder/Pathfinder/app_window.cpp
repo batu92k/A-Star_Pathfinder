@@ -61,36 +61,12 @@ unsigned int shaderProgram;
 unsigned int VAO;
 unsigned int EBO; // element array buffer
 
+static void GenerateDrawBuffers(void);
 static void UpdateGridVertices(void);
 static void glfw_error_callback(int error, const char* description);
 static void glfw_mouse_btn_callback(GLFWwindow* window, int button, int action, int mods);
 
-
-void GenerateTestBuffers() 
-{
-	// generate arrays in the beginning
-	glGenBuffers(1, &VBO);
-	glGenBuffers(1, &EBO);
-	glGenVertexArrays(1, &VAO);
-	// 1. bind Vertex Array Object
-	glBindVertexArray(VAO);
-	// 2. copy our vertices array in a buffer for OpenGL to use
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(gridVertiColor), gridVertiColor, GL_STATIC_DRAW);
-	// 3. then set our vertex attributes pointers
-	// position has attribute 0
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-	// color has attribute 1 (has offset of 3 floats from beginning)
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
-	// element buffer
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(gridIndices), gridIndices, GL_STATIC_DRAW);
-}
-
-
-void Start_AppWindow()
+void Start_AppWindow(void)
 {
 	glfwSetErrorCallback(glfw_error_callback);
 	if (!glfwInit()) {
@@ -126,7 +102,7 @@ void Start_AppWindow()
 
 	UpdateGridVertices();
 
-	GenerateTestBuffers();
+	GenerateDrawBuffers();
 	CompileShader(vertexShaderSource, &vertexShader, GL_VERTEX_SHADER);
 	CompileShader(fragmentShaderSource, &fragmentShader, GL_FRAGMENT_SHADER);
 	Build_ShaderProgram(&vertexShader, &fragmentShader, &shaderProgram);
@@ -143,7 +119,6 @@ void Start_AppWindow()
 		glUseProgram(shaderProgram);
 		glBindVertexArray(VAO);
 		glDrawElements(GL_TRIANGLES, GRID_SIZE * GRID_SIZE * 6, GL_UNSIGNED_INT, 0);
-		glBindVertexArray(0);
 
 		glfwPollEvents();
 		glfwSwapBuffers(window);
@@ -154,6 +129,29 @@ void Start_AppWindow()
 	glDeleteProgram(shaderProgram);
 	glfwDestroyWindow(window);
 	glfwTerminate();
+}
+
+static void GenerateDrawBuffers(void)
+{
+	// generate arrays in the beginning
+	glGenBuffers(1, &VBO);
+	glGenBuffers(1, &EBO);
+	glGenVertexArrays(1, &VAO);
+	// 1. bind Vertex Array Object
+	glBindVertexArray(VAO);
+	// 2. copy our vertices array in a buffer for OpenGL to use
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(gridVertiColor), gridVertiColor, GL_STATIC_DRAW);
+	// 3. then set our vertex attributes pointers
+	// position has attribute 0
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+	// color has attribute 1 (has offset of 3 floats from beginning)
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+	// element buffer
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(gridIndices), gridIndices, GL_STATIC_DRAW);
 }
 
 static void UpdateGridVertices(void)
