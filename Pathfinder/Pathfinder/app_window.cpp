@@ -31,18 +31,6 @@ static void UpdateGridVertices(void);
 static void glfw_error_callback(int error, const char* description);
 static void glfw_mouse_btn_callback(GLFWwindow* window, int button, int action, int mods);
 
-float verticolor[] = {
-	 50.0f,  50.0f, 0.0f, 1.0f, 0, 0,
-	 50.0f, -50.0f, 0.0f, 1.0f, 1.0f, 0,
-	 -50.0f, -50.0f, 0.0f, 1.0f, 0, 1.0f,
-	 -50.0f,  50.0f, 0.0f, 1.0f, 1.0f, 0.0f,
-};
-
-unsigned int indices[] = {
-	0, 1, 3,   // first triangle
-	1, 2, 3    // second triangle
-};
-
 const char* vertexShaderSource =
 "#version 330 core\n"
 "layout(location = 0) in vec3 aPos;\n"
