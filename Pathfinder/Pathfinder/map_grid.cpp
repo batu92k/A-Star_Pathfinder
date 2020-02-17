@@ -32,25 +32,35 @@ MapGrid::GridSize MapGrid::GetGridSize(void)
 	return GridSize(_GridSizeX, _GridSizeY);
 }
 
-MapGrid::GridPos MapGrid::GetTarget(void)
+MapGrid::Node* MapGrid::GetTargetNode(void)
+{
+	return _Target;
+}
+
+MapGrid::Node* MapGrid::GetStartNode(void)
+{
+	return _Start;
+}
+
+MapGrid::GridPos MapGrid::GetTargetPos(void)
 {
 	return GridPos(_Target->x, _Target->y);
 }
 
-void MapGrid::SetTarget(GridPos targetPos)
+void MapGrid::SetTargetPos(GridPos targetPos)
 {
 	int idx = targetPos.second * _GridSizeX + targetPos.first;
 	if (idx > (_GridSizeX * _GridSizeY) || idx < 0) return;
 	_Target = &_Nodes[idx];
 }
 
-MapGrid::GridPos MapGrid::GetStart(void)
+MapGrid::GridPos MapGrid::GetStartPos(void)
 {
 	return GridPos(_Start->x, _Start->y);
 }
 
 
-void MapGrid::SetStart(GridPos startPos)
+void MapGrid::SetStartPos(GridPos startPos)
 {
 	int idx = startPos.second * _GridSizeX + startPos.first;
 	if (idx > (_GridSizeX * _GridSizeY - 1) || idx < 0) return;
@@ -60,7 +70,8 @@ void MapGrid::SetStart(GridPos startPos)
 void MapGrid::ToggleObstacle(GridPos obstaclePos)
 {
 	int idx = obstaclePos.second * _GridSizeX + obstaclePos.first;
-	if (idx > (_GridSizeX * _GridSizeY - 1) || idx < 0) return;
+	if (idx > (_GridSizeX * _GridSizeY - 1) || idx < 0) return; // if index is outside the array then return
+	if (&_Nodes[idx] == _Target || &_Nodes[idx] == _Start) return; // if index hits target or start then return
 	_Nodes[idx].isObstacle ^= true;
 }
 

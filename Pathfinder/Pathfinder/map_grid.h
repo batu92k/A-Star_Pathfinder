@@ -31,10 +31,12 @@ public:
 
 	// public funcrtion prototypes
 	MapGrid(int x, int y);
-	GridPos GetTarget(void);
-	void SetTarget(GridPos targetPos);
-	GridPos GetStart(void);
-	void SetStart(GridPos startPos);
+	Node* GetTargetNode(void);
+	Node* GetStartNode(void);
+	GridPos GetTargetPos(void);
+	void SetTargetPos(GridPos targetPos);
+	GridPos GetStartPos(void);
+	void SetStartPos(GridPos startPos);
 	void ResetMap();
 	void ToggleObstacle(GridPos obstaclePos);
 	std::vector<Node*> Find_AStar_Path();
