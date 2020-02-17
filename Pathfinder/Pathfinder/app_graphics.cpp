@@ -11,7 +11,7 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 
-bool CompileShader(const char* source, GLuint* outShader, GLenum shaderType)
+bool CompileShader(const GLchar* source, GLuint* outShader, GLenum shaderType)
 {
 	if (!(shaderType == GL_FRAGMENT_SHADER || shaderType == GL_VERTEX_SHADER)) {
 		return false;

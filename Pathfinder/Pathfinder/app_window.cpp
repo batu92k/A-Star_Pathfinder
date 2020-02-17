@@ -35,7 +35,7 @@ const float COLOR_OBSTACLE[3] = { 120.0f / 255.0f, 120.0f / 255.0f ,120.0f / 255
 const float COLOR_VISITED[3] = { 0.0f / 255.0f , 187.0f / 255.0f, 255.0f / 255.0f }; // light blue
 
 // Grid vertex shader source code
-const char* GRID_VS_SRC =
+const GLchar* GRID_VS_SRC =
 "#version 330 core\n"
 "layout(location = 0) in vec3 aPos;\n"
 "layout(location = 1) in vec3 aColor;\n"
@@ -48,7 +48,7 @@ const char* GRID_VS_SRC =
 "}\0";
 
 // Grid fragment shader source code
-const char* GRID_FS_SRC =
+const GLchar* GRID_FS_SRC =
 "#version 330 core\n"
 "out vec4 FragColor;\n"
 "in vec3 ourColor;\n"
@@ -58,7 +58,7 @@ const char* GRID_FS_SRC =
 "}\0";
 
 // Path vertex shader source code
-const char* PATH_VS_SRC =
+const GLchar* PATH_VS_SRC =
 "#version 330 core\n"
 "layout(location = 0) in vec3 aPos;\n"
 "void main()\n"
@@ -68,7 +68,7 @@ const char* PATH_VS_SRC =
 "}\0";
 
 // Path fragment shader source code
-const char* PATH_FS_SRC =
+const GLchar* PATH_FS_SRC =
 "#version 330 core\n"
 "out vec4 FragColor;\n"
 "void main()\n"
@@ -76,18 +76,18 @@ const char* PATH_FS_SRC =
 "	FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
 "}\0";
 
-unsigned int gridVS;
-unsigned int gridFS;
-unsigned int gridShaderPrg;
-unsigned int gridVAO;
-unsigned int gridVBO;
-unsigned int gridEBO; // element array buffer
+GLuint gridVS;
+GLuint gridFS;
+GLuint gridShaderPrg;
+GLuint gridVAO;
+GLuint gridVBO;
+GLuint gridEBO; // element array buffer
 
-unsigned int pathVS;
-unsigned int pathFS;
-unsigned int pathShaderPrg;
-unsigned int pathVAO;
-unsigned int pathVBO;
+GLuint pathVS;
+GLuint pathFS;
+GLuint pathShaderPrg;
+GLuint pathVAO;
+GLuint pathVBO;
 
 static void GenerateDrawBuffers(void);
 static void UpdateGridVertices(void);
@@ -201,7 +201,7 @@ static void GenerateDrawBuffers(void)
 	glBindVertexArray(pathVAO);
 	// compy vertices to VBO
 	glBindBuffer(GL_ARRAY_BUFFER, pathVBO);
-	glBufferData(GL_ARRAY_BUFFER, pathVertices.size() * sizeof(pathVertices[0]), &pathVertices[0], GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, pathVertices.size() * sizeof(float), &pathVertices[0], GL_DYNAMIC_DRAW);
 	// vertex attrib pointer
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
