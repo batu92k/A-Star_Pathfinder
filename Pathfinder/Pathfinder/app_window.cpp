@@ -27,11 +27,11 @@ MapGrid newMap(GRID_SIZE, GRID_SIZE);  // create 10x10 square map grid
 float gridVertiColor[GRID_SIZE * GRID_SIZE * 24];
 unsigned int gridIndices[GRID_SIZE * GRID_SIZE * 6];
 
-const float COLOR_EMPTY[3] = { 52.0f / 255.0f, 198.0f / 255.0f ,235.0f / 255.0f };
-const float COLOR_TARGET[3] = { 1.0f, 0.0f, 0.0f };
-const float COLOR_START[3] = { 0.0f, 1.0f, 0.0f };
-const float COLOR_OBSTACE[3] = { 169.0f / 255.0f, 169.0f / 255.0f ,169.0f / 255.0f };
-const float COLOR_VISITED[3] = { 235.0f / 255.0f , 153.0f / 255.0f, 52.0f / 255.0f };
+const float COLOR_EMPTY[3] = { 0.0f / 255.0f, 0.0f / 255.0f ,255.0f / 255.0f }; // blue
+const float COLOR_TARGET[3] = { 1.0f, 0.0f, 0.0f }; // red
+const float COLOR_START[3] = { 0.0f, 1.0f, 0.0f }; // green
+const float COLOR_OBSTACLE[3] = { 120.0f / 255.0f, 120.0f / 255.0f ,120.0f / 255.0f }; // gray
+const float COLOR_VISITED[3] = { 0.0f / 255.0f , 187.0f / 255.0f, 255.0f / 255.0f }; // light blue
 
 const char* vertexShaderSource =
 "#version 330 core\n"
@@ -173,7 +173,7 @@ static void UpdateGridVertices(void)
 		const float* cellColor = COLOR_EMPTY;
 		if (&mapGrid[i] == startNode) cellColor = COLOR_START;
 		else if (&mapGrid[i] == targetNode) cellColor = COLOR_TARGET;
-		else if (mapGrid[i].isObstacle) cellColor = COLOR_OBSTACE;
+		else if (mapGrid[i].isObstacle) cellColor = COLOR_OBSTACLE;
 		else if (mapGrid[i].isVisited) cellColor = COLOR_VISITED;
 
 		gridVertiColor[i * 24 + vtxIdx++] = centerX + (GRID_CELL_SIZE / 2.0f) * 0.8f; // x0
