@@ -158,7 +158,6 @@ void Start_AppWindow()
 
 static void UpdateGridVertices(void)
 {
-	newMap.ResetMap();
 	auto path = newMap.Find_AStar_Path();
 	MapGrid::Node* mapGrid = newMap.GetGridArray();
 	const MapGrid::Node* startNode = newMap.GetStartNode();

@@ -130,6 +130,7 @@ float MapGrid::Heuristic(Node* a, Node* b)
 
 std::vector<MapGrid::Node*> MapGrid::Find_AStar_Path()
 {
+	ResetMap();
 	std::vector<Node*> path;
 	Node* current = _Start;
 	_Start->localGoal = 0.0f;
