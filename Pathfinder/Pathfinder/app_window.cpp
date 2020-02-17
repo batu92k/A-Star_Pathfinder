@@ -26,6 +26,7 @@ const float GRID_CELL_SIZE = (APP_WINDOW_SIZE - 2.0f * DRAW_FRAME_OFFSET) / GRID
 MapGrid newMap(GRID_SIZE, GRID_SIZE);  // create 10x10 square map grid
 float gridVertiColor[GRID_SIZE * GRID_SIZE * 24];
 unsigned int gridIndices[GRID_SIZE * GRID_SIZE * 6];
+std::vector<float> pathVertices;
 
 const float COLOR_EMPTY[3] = { 0.0f / 255.0f, 0.0f / 255.0f ,255.0f / 255.0f }; // blue
 const float COLOR_TARGET[3] = { 1.0f, 0.0f, 0.0f }; // red
@@ -33,7 +34,8 @@ const float COLOR_START[3] = { 0.0f, 1.0f, 0.0f }; // green
 const float COLOR_OBSTACLE[3] = { 120.0f / 255.0f, 120.0f / 255.0f ,120.0f / 255.0f }; // gray
 const float COLOR_VISITED[3] = { 0.0f / 255.0f , 187.0f / 255.0f, 255.0f / 255.0f }; // light blue
 
-const char* vertexShaderSource =
+// Grid vertex shader source code
+const char* GRID_VS_SRC =
 "#version 330 core\n"
 "layout(location = 0) in vec3 aPos;\n"
 "layout(location = 1) in vec3 aColor;\n"
@@ -45,7 +47,8 @@ const char* vertexShaderSource =
 "   ourColor = aColor;\n"
 "}\0";
 
-const char* fragmentShaderSource =
+// Grid fragment shader source code
+const char* GRID_FS_SRC =
 "#version 330 core\n"
 "out vec4 FragColor;\n"
 "in vec3 ourColor;\n"
@@ -54,12 +57,37 @@ const char* fragmentShaderSource =
 "	FragColor = vec4(ourColor, 1.0);\n"
 "}\0";
 
-unsigned int VBO;
-unsigned int vertexShader;
-unsigned int fragmentShader;
-unsigned int shaderProgram;
-unsigned int VAO;
-unsigned int EBO; // element array buffer
+// Path vertex shader source code
+const char* PATH_VS_SRC =
+"#version 330 core\n"
+"layout(location = 0) in vec3 aPos;\n"
+"void main()\n"
+"{\n"
+"   vec3 orthoPos = (aPos - 400) / 400.0f;\n"
+"   gl_Position = vec4(orthoPos, 1.0);\n"
+"}\0";
+
+// Path fragment shader source code
+const char* PATH_FS_SRC =
+"#version 330 core\n"
+"out vec4 FragColor;\n"
+"void main()\n"
+"{\n"
+"	FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+"}\0";
+
+unsigned int gridVS;
+unsigned int gridFS;
+unsigned int gridShaderPrg;
+unsigned int gridVAO;
+unsigned int gridVBO;
+unsigned int gridEBO; // element array buffer
+
+unsigned int pathVS;
+unsigned int pathFS;
+unsigned int pathShaderPrg;
+unsigned int pathVAO;
+unsigned int pathVBO;
 
 static void GenerateDrawBuffers(void);
 static void UpdateGridVertices(void);
@@ -103,9 +131,12 @@ void Start_AppWindow(void)
 	UpdateGridVertices();
 
 	GenerateDrawBuffers();
-	CompileShader(vertexShaderSource, &vertexShader, GL_VERTEX_SHADER);
-	CompileShader(fragmentShaderSource, &fragmentShader, GL_FRAGMENT_SHADER);
-	Build_ShaderProgram(&vertexShader, &fragmentShader, &shaderProgram);
+	CompileShader(GRID_VS_SRC, &gridVS, GL_VERTEX_SHADER);
+	CompileShader(GRID_FS_SRC, &gridFS, GL_FRAGMENT_SHADER);
+	Build_ShaderProgram(&gridVS, &gridFS, &gridShaderPrg);
+	CompileShader(PATH_VS_SRC, &pathVS, GL_VERTEX_SHADER);
+	CompileShader(PATH_FS_SRC, &pathFS, GL_FRAGMENT_SHADER);
+	Build_ShaderProgram(&pathVS, &pathFS, &pathShaderPrg);
 
 	while (!glfwWindowShouldClose(window))
 	{	
@@ -116,31 +147,38 @@ void Start_AppWindow(void)
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		//Draw Here!
-		glUseProgram(shaderProgram);
-		glBindVertexArray(VAO);
+		glUseProgram(gridShaderPrg);
+		glBindVertexArray(gridVAO);
 		glDrawElements(GL_TRIANGLES, GRID_SIZE * GRID_SIZE * 6, GL_UNSIGNED_INT, 0);
+		glUseProgram(pathShaderPrg);
+		glBindVertexArray(pathVAO);
+		glDrawArrays(GL_LINE_STRIP, 0, pathVertices.size() / 3);
 
 		glfwPollEvents();
 		glfwSwapBuffers(window);
 	}
 
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
-	glDeleteProgram(shaderProgram);
+	glDeleteShader(gridVS);
+	glDeleteShader(gridFS);
+	glDeleteProgram(gridShaderPrg);
+	glDeleteShader(pathVS);
+	glDeleteShader(pathFS);
+	glDeleteProgram(pathShaderPrg);
 	glfwDestroyWindow(window);
 	glfwTerminate();
 }
 
 static void GenerateDrawBuffers(void)
 {
+	// GRID DRAW BUFFERS
 	// generate arrays in the beginning
-	glGenBuffers(1, &VBO);
-	glGenBuffers(1, &EBO);
-	glGenVertexArrays(1, &VAO);
+	glGenBuffers(1, &gridVBO);
+	glGenBuffers(1, &gridEBO);
+	glGenVertexArrays(1, &gridVAO);
 	// 1. bind Vertex Array Object
-	glBindVertexArray(VAO);
+	glBindVertexArray(gridVAO);
 	// 2. copy our vertices array in a buffer for OpenGL to use
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, gridVBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(gridVertiColor), gridVertiColor, GL_STATIC_DRAW);
 	// 3. then set our vertex attributes pointers
 	// position has attribute 0
@@ -150,8 +188,21 @@ static void GenerateDrawBuffers(void)
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 	// element buffer
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gridEBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(gridIndices), gridIndices, GL_STATIC_DRAW);
+
+	// PATH DRAW BUFFERS
+	// generate arrays
+	glGenBuffers(1, &pathVBO);
+	glGenVertexArrays(1, &pathVAO);
+	// bind vertex array obj
+	glBindVertexArray(pathVAO);
+	// compy vertices to VBO
+	glBindBuffer(GL_ARRAY_BUFFER, pathVBO);
+	glBufferData(GL_ARRAY_BUFFER, pathVertices.size() * sizeof(pathVertices[0]), &pathVertices[0], GL_STATIC_DRAW);
+	// vertex attrib pointer
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
 }
 
 static void UpdateGridVertices(void)
@@ -160,7 +211,7 @@ static void UpdateGridVertices(void)
 	MapGrid::Node* mapGrid = newMap.GetGridArray();
 	const MapGrid::Node* startNode = newMap.GetStartNode();
 	const MapGrid::Node* targetNode = newMap.GetTargetNode();
-
+	// update grid draw vertices and colors
 	for (int i = 0; i < GRID_SIZE * GRID_SIZE; i++)
 	{
 		float centerX = DRAW_FRAME_OFFSET + GRID_CELL_SIZE * mapGrid[i].x + (GRID_CELL_SIZE / 2.0f);
@@ -206,8 +257,23 @@ static void UpdateGridVertices(void)
 		gridIndices[i * 6 + indiceIdx++] = i * 4 + 3;
 	}
 	// update grid VBO after modification
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, gridVBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(gridVertiColor), gridVertiColor, GL_STATIC_DRAW);
+
+	// generate path vertices
+	pathVertices.clear();
+	for (int i = 0; i < path.size(); i++)
+	{
+		float centerX = DRAW_FRAME_OFFSET + GRID_CELL_SIZE * path[i]->x + (GRID_CELL_SIZE / 2.0f);
+		float centerY = DRAW_FRAME_OFFSET + GRID_CELL_SIZE * path[i]->y + (GRID_CELL_SIZE / 2.0f);
+		pathVertices.push_back(centerX);
+		pathVertices.push_back(centerY);
+		pathVertices.push_back(150.0f);
+	}
+
+	// update path VBO after modification
+	glBindBuffer(GL_ARRAY_BUFFER, pathVBO);
+	glBufferData(GL_ARRAY_BUFFER, pathVertices.size() * sizeof(pathVertices[0]), &pathVertices[0], GL_STATIC_DRAW);
 }
 
 static void glfw_error_callback(int error, const char* description)
