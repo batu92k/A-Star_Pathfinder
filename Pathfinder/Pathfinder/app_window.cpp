@@ -74,7 +74,7 @@ const GLchar* PATH_FS_SRC =
 "out vec4 FragColor;\n"
 "void main()\n"
 "{\n"
-"	FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+"	FragColor = vec4(255.0 / 255.0, 255.0 / 255.0, 0.0 / 255.0, 1.0f);\n"
 "}\0";
 
 GLuint gridVS;
@@ -311,7 +311,7 @@ static void UpdateGridVertices(void)
 			pathIndices.push_back(i * 4 + 2);
 			pathIndices.push_back(i * 4 + 3);
 		}
-		// update path VBO after modification
+		// update path VBO and EBO after modification
 		glBindBuffer(GL_ARRAY_BUFFER, pathVBO);
 		glBufferData(GL_ARRAY_BUFFER, pathVertices.size() * sizeof(float), &pathVertices[0], GL_DYNAMIC_DRAW);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, pathEBO);
