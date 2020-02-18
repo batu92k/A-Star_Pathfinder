@@ -29,11 +29,11 @@ unsigned int gridIndices[GRID_SIZE * GRID_SIZE * 6];
 std::vector<float> pathVertices;
 std::vector<unsigned int> pathIndices;
 
-const float COLOR_EMPTY[3] = { 0.0f / 255.0f, 0.0f / 255.0f ,255.0f / 255.0f }; // blue
-const float COLOR_TARGET[3] = { 1.0f, 0.0f, 0.0f }; // red
-const float COLOR_START[3] = { 0.0f, 1.0f, 0.0f }; // green
-const float COLOR_OBSTACLE[3] = { 120.0f / 255.0f, 120.0f / 255.0f ,120.0f / 255.0f }; // gray
-const float COLOR_VISITED[3] = { 0.0f / 255.0f , 187.0f / 255.0f, 255.0f / 255.0f }; // light blue
+const float COLOR_EMPTY[3] = { 0.0f / 255.0f, 0.0f / 255.0f ,255.0f / 255.0f };
+const float COLOR_TARGET[3] = { 153.0f / 255.0f , 4.0f / 255.0f, 212.0f / 255.0f };
+const float COLOR_START[3] = { 0.0f, 1.0f, 0.0f };
+const float COLOR_OBSTACLE[3] = { 255.0f / 255.0f, 120.0f / 255.0f ,120.0f / 255.0f };
+const float COLOR_VISITED[3] = { 0.0f / 255.0f , 187.0f / 255.0f, 255.0f / 255.0f };
 
 // Grid vertex shader source code
 const GLchar* GRID_VS_SRC =
