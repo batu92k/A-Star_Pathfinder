@@ -336,8 +336,8 @@ static void glfw_mouse_btn_callback(GLFWwindow* window, int button, int action, 
 
 	if (curPosX > DRAW_FRAME_OFFSET&& curPosX < ((double)width - DRAW_FRAME_OFFSET) &&
 		curPosY > DRAW_FRAME_OFFSET&& curPosY < ((double)height - DRAW_FRAME_OFFSET)) {
-		int cellX = (curPosX - DRAW_FRAME_OFFSET) / GRID_CELL_SIZE;
-		int cellY = (curPosY - DRAW_FRAME_OFFSET) / GRID_CELL_SIZE;
+		int cellX = (int)((curPosX - DRAW_FRAME_OFFSET) / GRID_CELL_SIZE);
+		int cellY = (int)((curPosY - DRAW_FRAME_OFFSET) / GRID_CELL_SIZE);
 
 		if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
 			newMap.ToggleObstacle(MapGrid::GridPos(cellX, cellY));
