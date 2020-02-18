@@ -27,6 +27,7 @@ MapGrid newMap(GRID_SIZE, GRID_SIZE);  // create 10x10 square map grid
 float gridVertiColor[GRID_SIZE * GRID_SIZE * 24];
 unsigned int gridIndices[GRID_SIZE * GRID_SIZE * 6];
 std::vector<float> pathVertices;
+std::vector<unsigned int> pathIndices;
 
 const float COLOR_EMPTY[3] = { 0.0f / 255.0f, 0.0f / 255.0f ,255.0f / 255.0f }; // blue
 const float COLOR_TARGET[3] = { 1.0f, 0.0f, 0.0f }; // red
@@ -88,6 +89,7 @@ GLuint pathFS;
 GLuint pathShaderPrg;
 GLuint pathVAO;
 GLuint pathVBO;
+GLuint pathEBO;
 
 static void GenerateDrawBuffers(void);
 static void UpdateGridVertices(void);
@@ -150,10 +152,14 @@ void Start_AppWindow(void)
 		glUseProgram(gridShaderPrg);
 		glBindVertexArray(gridVAO);
 		glDrawElements(GL_TRIANGLES, GRID_SIZE * GRID_SIZE * 6, GL_UNSIGNED_INT, 0);
+		glBindVertexArray(0);
+		glUseProgram(0);
 		if (pathVertices.size()) {
 			glUseProgram(pathShaderPrg);
 			glBindVertexArray(pathVAO);
-			glDrawArrays(GL_LINE_STRIP, 0, pathVertices.size() / 3);
+			glDrawElements(GL_TRIANGLES, pathIndices.size(), GL_UNSIGNED_INT, 0);
+			glBindVertexArray(0);
+			glUseProgram(0);
 		}
 
 		glfwPollEvents();
@@ -196,6 +202,7 @@ static void GenerateDrawBuffers(void)
 	// PATH DRAW BUFFERS
 	// generate arrays
 	glGenBuffers(1, &pathVBO);
+	glGenBuffers(1, &pathEBO);
 	glGenVertexArrays(1, &pathVAO);
 	// bind vertex array obj
 	glBindVertexArray(pathVAO);
@@ -205,6 +212,9 @@ static void GenerateDrawBuffers(void)
 	// vertex attrib pointer
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
+	// element buffer
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, pathEBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, pathIndices.size() * sizeof(unsigned int), &pathIndices[0], GL_DYNAMIC_DRAW);
 }
 
 static void UpdateGridVertices(void)
@@ -264,19 +274,48 @@ static void UpdateGridVertices(void)
 
 	// generate path vertices
 	pathVertices.clear();
+	pathIndices.clear();
 	if (path.size()) // if path is found then update vertices
 	{
-		for (int i = 0; i < path.size(); i++)
+		for (int i = 0; i < path.size() - 1; i++)
 		{
 			float centerX = DRAW_FRAME_OFFSET + GRID_CELL_SIZE * path[i]->x + (GRID_CELL_SIZE / 2.0f);
 			float centerY = DRAW_FRAME_OFFSET + GRID_CELL_SIZE * path[i]->y + (GRID_CELL_SIZE / 2.0f);
-			pathVertices.push_back(centerX);
-			pathVertices.push_back(centerY);
+			float centerX_1 = DRAW_FRAME_OFFSET + GRID_CELL_SIZE * path[i + 1]->x + (GRID_CELL_SIZE / 2.0f);
+			float centerY_1 = DRAW_FRAME_OFFSET + GRID_CELL_SIZE * path[i + 1]->y + (GRID_CELL_SIZE / 2.0f);
+			float vX = centerX_1 - centerX;
+			float vY = centerY_1 - centerY;
+			float vR = sqrtf(vX * vX + vY * vY);
+			float lineWidth = GRID_CELL_SIZE * 0.1f;
+			// normalize vector
+			vX /= vR;
+			vY /= vR;
+			// generate thick path lines with triangles
+			pathVertices.push_back(centerX_1 + (-vY * lineWidth));
+			pathVertices.push_back(centerY_1 + (vX * lineWidth));
 			pathVertices.push_back(150.0f);
+			pathVertices.push_back(centerX_1 + (vY * lineWidth));
+			pathVertices.push_back(centerY_1 + (-vX * lineWidth));
+			pathVertices.push_back(150.0f);
+			pathVertices.push_back(centerX + (vY * lineWidth));
+			pathVertices.push_back(centerY + (-vX * lineWidth));
+			pathVertices.push_back(150.0f);
+			pathVertices.push_back(centerX + +(-vY * lineWidth));
+			pathVertices.push_back(centerY + (vX * lineWidth));
+			pathVertices.push_back(150.0f);
+
+			pathIndices.push_back(i * 4);
+			pathIndices.push_back(i * 4 + 1);
+			pathIndices.push_back(i * 4 + 3);
+			pathIndices.push_back(i * 4 + 1);
+			pathIndices.push_back(i * 4 + 2);
+			pathIndices.push_back(i * 4 + 3);
 		}
 		// update path VBO after modification
 		glBindBuffer(GL_ARRAY_BUFFER, pathVBO);
 		glBufferData(GL_ARRAY_BUFFER, pathVertices.size() * sizeof(float), &pathVertices[0], GL_DYNAMIC_DRAW);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, pathEBO);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, pathIndices.size() * sizeof(unsigned int), &pathIndices[0], GL_DYNAMIC_DRAW);
 	}
 }
 
